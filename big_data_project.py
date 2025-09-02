@@ -1,7 +1,13 @@
 import pandas as pd
 import re
+import os
 from a_priori import a_priori_algorithm
 from toivonen import toivonen_algorithm
+
+
+# Change the working directory to the directory containing the script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_dir)
 
 def crea_lista_transazioniID(transazioni, mappatura_item):
     lista_transazioniID=[]
@@ -25,7 +31,7 @@ def stampa_itemset_frequenti_nomi(itemset_freq, mappatura_inversa):
     return itemset_freq_nomi
 
 # LETTURA FILE CSV in un pandas dataframe
-df = pd.read_csv('archive/Assignment-1_Data.csv', sep=";")
+df = pd.read_csv('Assignment-1_Data.csv', sep=";")
 #print(df["Itemname"].tolist())
 
 
@@ -71,12 +77,14 @@ lista_transazioniID = crea_lista_transazioniID(transazioni, mappatura_item)
 
 
 # ESECUZIONE DELL'ALGORITMO A-PRIORI
-#itemset_freq_a_priori = a_priori_algorithm(lista_transazioniID, 500)
+#itemset_freq_a_priori, _, _ = a_priori_algorithm(lista_transazioniID, 500)
 #print(itemset_freq_a_priori)
 #itemset_freq_a_priori_nomi = stampa_itemset_frequenti_nomi(itemset_freq_a_priori, mappatura_inversa)
 #print(itemset_freq_a_priori_nomi)
 
 
 # ESECUZIONE DELL'ALGORITMO DI TOIVONEN
-toivonen_algorithm(lista_transazioniID, 500, 0.3)
+toivonen_algorithm(lista_transazioniID, 500, 0.05)
+
+
 
