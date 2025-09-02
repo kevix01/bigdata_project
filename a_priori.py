@@ -1,4 +1,6 @@
 from itertools import combinations
+from multiprocessing import Pool, cpu_count
+
 
 """ baskets = [{1,2,4,5,7},{1,2,6},{1,4,6,7},{3,5,6},{1,2,4,7}]
 minSup = 3 """
@@ -7,7 +9,37 @@ minSup = 3 """
 def getUnion(itemSet,k):
     return set([i.union(j) for i in itemSet for j in itemSet if len(i.union(j))==k])
 
-# select frequent items
+def process_basket(args):
+    idx, b, candidateSet, k, total = args
+    local_count = {}
+    for s in combinations(b, k):
+        fs = frozenset(s)
+        if fs in candidateSet:
+            local_count[fs] = local_count.get(fs, 0) + 1
+
+    # stampa progressiva
+    #print(f"[Process] Basket {idx+1}/{total} completato")
+
+    return local_count
+
+def filterCandidates(candidateSet, baskets, minSup, k):
+    total = len(baskets)
+    # includo l'indice per poter stampare progressivamente
+    tasks = [(i, b, candidateSet, k, total) for i, b in enumerate(baskets)]
+
+    with Pool(cpu_count()) as pool:
+        results = pool.map(process_basket, tasks)
+
+    # riduzione dei conteggi
+    count = {}
+    for local_count in results:
+        for item, v in local_count.items():
+            count[item] = count.get(item, 0) + v
+
+    #print("[Main] Tutti i basket sono stati elaborati.")
+    return {item for item, v in count.items() if v >= minSup}
+
+""" # select frequent items
 def filterCandidates(candidateSet,baskets,minSup,k):
     count = dict()
     counter = 0
@@ -25,7 +57,7 @@ def filterCandidates(candidateSet,baskets,minSup,k):
         if (k == 3) and (counter % 100 == 0):
             print(counter)
     # return the set of itemsets with count equal or above the threshold
-    return {k for k,v in count.items() if v >= minSup}
+    return {k for k,v in count.items() if v >= minSup} """
 
 
 def a_priori_algorithm(baskets, minSup):
