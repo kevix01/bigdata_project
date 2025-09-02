@@ -10,6 +10,7 @@ def getUnion(itemSet,k):
 # select frequent items
 def filterCandidates(candidateSet,baskets,minSup,k):
     count = dict()
+    counter = 0
     for b in baskets:
         # create all subsets of size k from basket
         subsets = list(combinations(b,k))
@@ -20,6 +21,9 @@ def filterCandidates(candidateSet,baskets,minSup,k):
                     count[frozenset(s)] +=1
                 except KeyError:
                     count[frozenset(s)] = 1
+        counter += 1
+        if (k == 3) and (counter % 100 == 0):
+            print(counter)
     # return the set of itemsets with count equal or above the threshold
     return {k for k,v in count.items() if v >= minSup}
 
@@ -45,15 +49,18 @@ def a_priori_algorithm(baskets, minSup):
     currentLSet = L1ItemSet
     frequentItemsets = currentLSet
     allFrequentItemsets = [currentLSet]
+    set_candidate_itemsets = set()
     k = 2
 
-    while currentLSet and k<=3:
+    while currentLSet and k <=3 :
         # create candidate set from k-1 frequent itemsets
         print("Generazione set candidati di dimensione "+str(k))
         candidateSet = getUnion(currentLSet,k)
+        set_candidate_itemsets.update(candidateSet)
         # filter itemsets by frequency
         print("Filtraggio set candidati...")
         currentLSet = filterCandidates(candidateSet,baskets,minSup,k)
+        
         # add frequent itemsets of size k to the frequent itemset
         frequentItemsets=frequentItemsets.union(currentLSet)
         allFrequentItemsets.append(currentLSet)
@@ -62,4 +69,4 @@ def a_priori_algorithm(baskets, minSup):
         k += 1
 
     #print(frequentItemsets)
-    return allFrequentItemsets
+    return allFrequentItemsets, frequentItemsets, set_candidate_itemsets
