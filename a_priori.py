@@ -36,7 +36,7 @@ def filterCandidates(candidateSet, baskets, minSup, k):
         for item, v in local_count.items():
             count[item] = count.get(item, 0) + v
 
-    #print("[Main] Tutti i basket sono stati elaborati.")
+    print("[Main] Tutti i basket sono stati elaborati.")
     return {item for item, v in count.items() if v >= minSup}
 
 """ # select frequent items
@@ -80,7 +80,8 @@ def a_priori_algorithm(baskets, minSup):
     # pass 2,...,k
     currentLSet = L1ItemSet
     frequentItemsets = currentLSet
-    allFrequentItemsets = [currentLSet]
+    allFrequentItemsets = []
+    allFrequentItemsets.extend(currentLSet)
     set_candidate_itemsets = set()
     k = 2
 
@@ -95,7 +96,7 @@ def a_priori_algorithm(baskets, minSup):
         
         # add frequent itemsets of size k to the frequent itemset
         frequentItemsets=frequentItemsets.union(currentLSet)
-        allFrequentItemsets.append(currentLSet)
+        allFrequentItemsets.extend(currentLSet)
         #print(currentLSet)
         #break
         k += 1

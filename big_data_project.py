@@ -15,19 +15,22 @@ def crea_lista_transazioniID(transazioni, mappatura_item):
         lista_transazioniID.append([mappatura_item[item] for item in tr])
     return lista_transazioniID
 
-def stampa_itemset_frequenti_nomi(itemset_freq, mappatura_inversa):
+def stampa_itemset_frequenti_nomi(itemset_freq, mappatura_inversa, nome_file):
+    f=open(nome_file,"w")
     itemset_freq_nomi = []
-    print("Itemset frequenti:")
+    f.write("Itemset frequenti:\n")
     k=1
-    for livello in itemset_freq:
-        print("Livello "+str(k))
-        for itemset in livello:
-            itemlist=list(itemset)
-            itemset_nomi = [mappatura_inversa[i] for i in itemlist]
-            print(itemset_nomi)
-            itemset_freq_nomi.append(itemset_nomi)
-        k+=1
-        print("\n")
+    f.write("Itemset di livello 1:\n")
+    for itemset in itemset_freq:
+        if len(itemset)>k:
+            k+=1
+            f.write(f"Itemset di livello {k}:\n")
+        itemlist=list(itemset)
+        itemset_nomi = [mappatura_inversa[i] for i in itemlist]
+        f.write(str(itemset_nomi)+"\n")
+        itemset_freq_nomi.append(itemset_nomi)
+    f.write("\n")
+    f.close()
     return itemset_freq_nomi
 
 if __name__ == "__main__":
@@ -72,20 +75,27 @@ if __name__ == "__main__":
     mappatura_inversa = {i: item for item, i in mappatura_item.items()}
     #print(mappatura_inversa[528])
 
+
     # CREAZIONE LISTA DELLE TRANSAZIONI CON INDICI DEGLI ITEM
     lista_transazioniID = crea_lista_transazioniID(transazioni, mappatura_item)
     #print(len(lista_transazioniID))
 
 
     # ESECUZIONE DELL'ALGORITMO A-PRIORI
-    #itemset_freq_a_priori, _, _ = a_priori_algorithm(lista_transazioniID, 500)
-    #print(itemset_freq_a_priori)
-    #itemset_freq_a_priori_nomi = stampa_itemset_frequenti_nomi(itemset_freq_a_priori, mappatura_inversa)
+    print("\nEsecuzione algoritmo A-priori")
+    itemset_freq_a_priori, _, _ = a_priori_algorithm(lista_transazioniID, 400)
+    print(itemset_freq_a_priori)
+    # STAMPA RISULTATI TOIVONEN SU FILE
+    itemset_freq_a_priori_nomi = stampa_itemset_frequenti_nomi(itemset_freq_a_priori, mappatura_inversa, "Risultati_A_priori.txt")
     #print(itemset_freq_a_priori_nomi)
 
 
     # ESECUZIONE DELL'ALGORITMO DI TOIVONEN
-    toivonen_algorithm(lista_transazioniID, 500, 0.05)
+    print("\nEsecuzione algoritmo Toivonen")
+    sorted_frequent_itemset=toivonen_algorithm(lista_transazioniID, 400, 0.5)
+
+    # STAMPA RISULTATI TOIVONEN SU FILE
+    stampa_itemset_frequenti_nomi(sorted_frequent_itemset,mappatura_inversa,"Risultati_Toivonen.txt")
 
 
 
